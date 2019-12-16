@@ -142,4 +142,4 @@ stock_cleaned_sorted=stock_cleaned.sort_values(['Symbol','Date'])
 ends(stock_cleaned_sorted)
 
 # Save cleaned and sorted data
-stock_cleaned_sorted.to_csv(os.path.join('C:/Users/FN.LN/Documents/Market', 'SP500_FIVE_YR_FULL_PERIOD.csv'),sep=',', index=False)
+stock_cleaned_sorted.to_csv(os.path.join('C:/Users/FN.LN/Documents/Market', 'SP500_FIVE_YR_Cleaned_Sorted.csv'),sep=',', index=False)
