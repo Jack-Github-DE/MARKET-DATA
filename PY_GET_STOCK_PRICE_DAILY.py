@@ -113,6 +113,10 @@ stock_with_record_count.groupby('Row Count')['Symbol'].nunique()
 # for example, symbol M has date 2019-12-12 doubled with NaN
 stock_with_record_count[stock_with_record_count['Symbol']=='M']
 
+#For the counts very different from the right one (1246), their ticker will be dropped. 
+#for the counts very close (1247), looks they have one more blank row, I will only drop that one blank row. 
+#Don't worry about the order of the Date, when do the analysis, those symbols' dataframe will be sorted by date and joined by date later
+
 # Now drop any row with column 'Open'= NaN 
 stock_no_na=stock_raw_df.dropna(subset=['Open']).reset_index(drop=True)
 stock_no_na[stock_no_na['Symbol']=='M'] # NaN dropped
