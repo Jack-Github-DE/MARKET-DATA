@@ -95,6 +95,6 @@ def get_symbol_price(symbols):
     return stock_df 
 
 df=get_symbol_price(stocks)
-df.to_csv(os.path.join('C:/Users/FN.LN/Documents/Python/Data/Market', 'SP500_FIVE_YR.csv'),index=False)
+df.to_csv(os.path.join('C:/Users/FN.LN/Documents/Python/Data/Market', 'SP500_FIVE_YR_RAW.csv'),index=False)
 
 
