@@ -17,8 +17,10 @@ import datetime
 import pandas as pd
 import os
 
-
-# In[113]:
+# Define a func to return head and tail of a df
+def ends(df,x=1):
+    dfends=df.head(x).append(df.tail(x))
+    return dfends 
 
 
 # Official site of SP500: https://us.spindices.com/indices/equity/sp-500; but they don't have the list to download
@@ -97,4 +99,43 @@ def get_symbol_price(symbols):
 df=get_symbol_price(stocks)
 df.to_csv(os.path.join('C:/Users/FN.LN/Documents/Python/Data/Market', 'SP500_FIVE_YR_RAW.csv'),index=False)
 
+# After saving the raw data as CSV, read it for inspection of NaN/Blanks
+stock_raw_df=pd.read_csv(os.path.join('C:/Users/FN.LN/Documents/Market', 'SP500_FIVE_YR_RAW.csv'),sep=',')
 
+# Count # of records by Symbol
+symbol_count=stock_raw_df.groupby(['Symbol']).size().reset_index(name='Row Count')
+stock_with_record_count=pd.merge(stock_raw_df,symbol_count, on='Symbol',how='left')
+
+# A quick check showed there are problem raw data whose count is 1247, more than the correct one 1246
+##print("Unique number of trading days: ", pd.unique(stock_with_record_count['Row Count'])) # this line works too
+stock_with_record_count.groupby('Row Count')['Symbol'].nunique()
+
+# for example, symbol M has date 2019-12-12 doubled with NaN
+stock_with_record_count[stock_with_record_count['Symbol']=='M']
+
+# Now drop any row with column 'Open'= NaN 
+stock_no_na=stock_raw_df.dropna(subset=['Open']).reset_index(drop=True)
+stock_no_na[stock_no_na['Symbol']=='M'] # NaN dropped
+
+# after dropping na, count # of rows again
+symbol_count=stock_no_na.groupby(['Symbol']).size().reset_index(name='Row Count')
+stock_no_na_count=pd.merge(stock_no_na,symbol_count, on='Symbol',how='left')
+ends(stock_no_na_count)
+
+# Now the 1247 count is gone
+stock_no_na_count.groupby('Row Count')['Symbol'].nunique()
+
+# Only select the symbols with count == 1246, i.e symbols with the correct # of trading days through out the tracking period
+stock_cleaned=stock_no_na_count[stock_no_na_count['Row Count']==1246].reset_index(drop=True)
+ends(stock_cleaned)
+
+# below are the problem tickers that are excluded
+prob_ticker=stock_no_na_count[stock_no_na_count['Row Count']!=1246].reset_index(drop=True)
+pd.unique(prob_ticker['Symbol']).tolist()
+
+# Before saving the cleaned data, sort by symbol and date
+stock_cleaned_sorted=stock_cleaned.sort_values(['Symbol','Date'])
+ends(stock_cleaned_sorted)
+
+# Save cleaned and sorted data
+stock_cleaned_sorted.to_csv(os.path.join('C:/Users/FN.LN/Documents/Market', 'SP500_FIVE_YR_FULL_PERIOD.csv'),sep=',', index=False)
